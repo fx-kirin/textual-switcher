@@ -6,6 +6,9 @@ from gi.repository.GdkPixbuf import Pixbuf, InterpType
 from gi.repository import Gtk, GdkX11, Wnck, GLib
 
 
+MAX_NR_VISIBLE_ROWS = 6
+
+
 KEYCODE_ESCAPE = 9
 KEYCODE_ENTER = 36
 KEYCODE_CTRL = 37
@@ -24,7 +27,6 @@ class EntryWindow(Gtk.Window):
 
     def __init__(self, lockfile_path):
         Gtk.Window.__init__(self, title=self.WINDOW_TITLE)
-        self.set_size_request(450, 500)
         self.set_position(Gtk.WindowPosition.CENTER)
 
         self._xid = None
@@ -42,8 +44,6 @@ class EntryWindow(Gtk.Window):
         vbox.pack_start(self.entry, expand=False, fill=True, padding=0)
 
         self.task_liststore = Gtk.ListStore(Pixbuf, str, str, int)
-
-
         self.task_filter = self.task_liststore.filter_new()
         self.task_filter.set_visible_func(self.task_filter_func)
 
@@ -68,15 +68,15 @@ class EntryWindow(Gtk.Window):
         self._select_first()
         self._is_ctrl_pressed = False
 
-        label = Gtk.Label()
-        label.set_text("Keyboard shortcuts:\n"
+        self.label = Gtk.Label()
+        self.label.set_text("Keyboard shortcuts:\n"
                        "Ctrl+J: Move the selection down by one\n"
                        "Ctrl+K: Move the selection up by one\n"
                        "Ctrl+L: Reload the windows list\n"
                        "Ctrl+W: Empty search filter\n"
                        "Ctrl+C: Exit")
-        label.set_justify(Gtk.Justification.LEFT)
-        vbox.pack_start(label, False, True, 0)
+        self.label.set_justify(Gtk.Justification.LEFT)
+        vbox.pack_start(self.label, False, True, 0)
         self._lockfile_path = lockfile_path
         self.register_sighup(self._focus_on_me)
 
@@ -162,10 +162,21 @@ class EntryWindow(Gtk.Window):
             wlist_output = io.read()
             windows = parse_wlist_output(wlist_output)
             self._update_task_liststore_callback(windows)
+            self._set_height()
 
         self.source_id_out = io.add_watch(GLib.IO_IN|GLib.IO_HUP,
                                           wlist_finish_callback,
                                           priority=GLib.PRIORITY_HIGH)
+
+    def _set_height(self):
+        line_height = self.treeview.get_cell_area(self.treeview.get_cursor()[0]).height
+        line_height += 8
+        label_height = self.label.get_preferred_height()[0]
+        entry_height = self.entry.get_preferred_height()[0]
+        nr_rows = len(self.task_filter)
+        nr_visible_rows = min(MAX_NR_VISIBLE_ROWS, nr_rows)
+        height = entry_height + line_height * nr_visible_rows + label_height
+        self.set_size_request(450, height)
 
     def _entry_activated(self, *args):
         self._window_selected()
