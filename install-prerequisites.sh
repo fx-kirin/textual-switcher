@@ -22,8 +22,7 @@ then
 	PACKAGES="
 		dconf-cli
 		python-gi
-		python-pip
-		libpython-dev
+		libpython2-dev
 	"
 elif [ "$OS" = "Linux Mint" ]
 then
@@ -32,8 +31,7 @@ then
 		dconf-cli
 		python-gi
                 build-essential
-		python-pip
-		libpython-dev
+		libpython2-dev
 	"
 else
 	echo "Error: Package manager was not found."

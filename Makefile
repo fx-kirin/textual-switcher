@@ -15,8 +15,9 @@ install: launch
 	@touch ${LOCKFILE_PATH}
 	@echo Setting the keyboard shortcut... >> installation.log 2>&1
 	@$(MAKE) install_firefox_extension >> installation.log 2>&1
-	@$(MAKE) install_chrome_extension >> installation.log 2>&1
-	@python apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
+	@$(MAKE) install_chromium_extension >> installation.log 2>&1
+	@echo apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
+	@python2 apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
 	@echo Installation complete.
 	@echo
 	@echo '*****************************************************************************************'
@@ -52,3 +53,14 @@ install_chrome_extension:
 	@echo Installing the API proxy manifest for the Chrome extension... >> installation.log 2>&1
 	@mkdir -p ~/.config/google-chrome/NativeMessagingHosts/
 	@cp browser-agent/chrome-tablister-extension/api_proxy_native_app.json ~/.config/google-chrome/NativeMessagingHosts/
+	
+.PHONY: install_chromium_extension
+install_chromium_extension:
+	@echo Installing the Chrome extension... >> installation.log 2>&1
+	@sudo mkdir -p /usr/share/chromium/extensions/
+	@sudo chmod 777 /usr/share/chromium/extensions/
+	@sudo cp browser-agent/chrome-tablister-extension/preferences-file.json /usr/share/chromium/extensions/${CHROME_EXTENSION_ID}.json
+	@sudo chmod +r /usr/share/chromium/extensions/${CHROME_EXTENSION_ID}.json
+	@echo Installing the API proxy manifest for the Chrome extension... >> installation.log 2>&1
+	@mkdir -p ~/.config/chromium/NativeMessagingHosts/
+	@cp browser-agent/chrome-tablister-extension/api_proxy_native_app.json ~/.config/chromium/NativeMessagingHosts/
