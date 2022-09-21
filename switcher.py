@@ -417,7 +417,7 @@ class EntryWindow(Gtk.Window):
                     tab = matching[0]
                     token = tab['title']
         score = self._get_score(token, window.wm_class)
-        return score > 40
+        return score
 
     def _send_signal_to_selected_process(self, signal_type):
         window_id = self._get_value_of_selected_row(self._COL_NR_WINDOW_ID)

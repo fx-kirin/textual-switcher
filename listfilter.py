@@ -1,6 +1,7 @@
 import unicodedata
 from curses.ascii import isprint
 from rapidfuzz import fuzz
+from fuzzyfinder import fuzzyfinder
 
 
 def filter_printable(string):
@@ -34,5 +35,9 @@ class ListFilter(object):
         candidate = self._normalize(candidate)
         if candidate in self._search_key or self._search_key in candidate:
             return 100
-        score = fuzz.ratio(self._search_key, candidate)
-        return score
+        found = fuzzyfinder(self._search_key, [candidate])
+        if len(list(found)):
+            score = fuzz.ratio(self._search_key, candidate)
+            return score
+        else:
+            return 0

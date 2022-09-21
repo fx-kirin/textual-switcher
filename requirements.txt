@@ -1,3 +1,4 @@
 expiringdict
 python-Levenshtein
 rapidfuzz
+fuzzyfinder
