@@ -1,18 +1,25 @@
-import gi
 import os
-import sys
 import signal
 import subprocess
+import sys
+
+import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository.GdkPixbuf import Pixbuf, InterpType
-from gi.repository import Gtk, GdkX11
-import pidfile
-import listfilter
-import tabcontrol
+
+import yaml
+import re
+from gi.repository import GdkX11, Gtk
+from gi.repository.GdkPixbuf import InterpType, Pixbuf
+
 import glib_wrappers
-import windowcontrol
 import keycodes
+import listfilter
+import pidfile
+import tabcontrol
+import windowcontrol
+from pathlib import Path
+
 
 
 class EntryWindow(Gtk.Window):
@@ -46,9 +53,16 @@ class EntryWindow(Gtk.Window):
         self._help_label = self._create_help_label()
         self._add_gui_components_to_window()
         self._async_list_windows()
+        self._focus_on_me()
+        self._search_textbox.grab_focus()
         self._windows = None
         self._tabs = {}
         self._expanded_mode = True
+        short_cut_path = Path("~/.textual_switcher/shortcuts.yml").expanduser()
+        if short_cut_path.exists():
+            self._shortcuts = yaml.safe_load(short_cut_path.read_text())
+        else:
+            self._shortcuts = None
 
     def _set_window_properties(self):
         self.set_size_request(500, 500)
@@ -265,9 +279,18 @@ class EntryWindow(Gtk.Window):
         elif keycode == keycodes.KEYCODE_ESCAPE:
             sys.exit(0)
         elif is_ctrl_pressed:
+            for shortcut in self._shortcuts:
+                if keycode == getattr(keycodes, shortcut["keycode"]):
+                    window_id = self._get_matched_window_id(shortcut["regexp"])
+                    self.set_visible(False)
+                    if window_id is not None:
+                        self._windowcontrol.focus_on_window(window_id)
+                    else:
+                        exec_command(shortcut["command"])
+                    return
             if keycode == keycodes.KEYCODE_D:
                 self._select_last_item()
-            if keycode == keycodes.KEYCODE_J:
+            elif keycode == keycodes.KEYCODE_J:
                 self._select_next_item()
             elif keycode == keycodes.KEYCODE_K:
                 self._select_previous_item()
@@ -285,7 +308,7 @@ class EntryWindow(Gtk.Window):
             elif keycode == keycodes.KEYCODE_SPACE:
                 self._expanded_mode = not self._expanded_mode
                 self._enforce_expanded_mode()
-            if keycode == keycodes.KEYCODE_H:
+            elif keycode == keycodes.KEYCODE_H:
                 self._toggle_help_text()
 
     def _treeview_keypress(self, *args):
@@ -334,13 +357,9 @@ class EntryWindow(Gtk.Window):
         search_key = search_textbox.get_text()
         self._listfilter.update_search_key(search_key)
         self._treefilter.refilter()
-        if not self._is_some_window_selected():
-            self._select_first_window()
         self._enforce_expanded_mode()
-        if len(self._tree):
-            self._select_first_tab_under_selected_window()
         self._tree.set_sort_func(1, self._compare_windows)
-        
+        self._select_first_window()
 
     def _select_first_tab_under_selected_window(self):
         # A bit of nasty GTK hackery
@@ -431,12 +450,28 @@ class EntryWindow(Gtk.Window):
         else:
             self._help_label.set_text(self.SHORT_HELP_TEXT)
 
+    def _get_matched_window_id(self, regexp):
+        for window in self._windows.values():
+            matches = re.search(regexp, window.title)
+            if matches is not None:
+                return window.xid
+        return None
+
 
 def show_window(window):
     window.connect("delete-event", Gtk.main_quit)
     window.show_all()
     window.realize()
 
+
+def exec_command(command):
+    subprocess.Popen(
+        command,
+        shell=True,
+        bufsize=-1,
+        stdout=None,
+        stderr=None,
+    )
 
 if __name__ == "__main__":
     # Not using an argument parser to not waste time in latency

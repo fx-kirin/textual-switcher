@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 gi.require_version('Wnck', '3.0')
+from gi.repository import Gtk
 from gi.repository import Wnck, GLib
 
 import glib_wrappers
