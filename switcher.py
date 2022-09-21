@@ -339,6 +339,8 @@ class EntryWindow(Gtk.Window):
         self._enforce_expanded_mode()
         if len(self._tree):
             self._select_first_tab_under_selected_window()
+        self._tree.set_sort_func(1, self._compare_windows)
+        
 
     def _select_first_tab_under_selected_window(self):
         # A bit of nasty GTK hackery

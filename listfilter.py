@@ -1,6 +1,6 @@
 import unicodedata
 from curses.ascii import isprint
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 
 def filter_printable(string):
