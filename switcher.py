@@ -277,7 +277,7 @@ class EntryWindow(Gtk.Window):
         elif keycode == keycodes.KEYCODE_ARROW_UP or keyval == keycodes.KEYVALUE_ARROW_UP:
             self._select_previous_item()
         elif keycode == keycodes.KEYCODE_ESCAPE:
-            sys.exit(0)
+            self.set_visible(False)
         elif is_ctrl_pressed:
             for shortcut in self._shortcuts:
                 if keycode == getattr(keycodes, shortcut["keycode"]):
