@@ -254,12 +254,13 @@ class EntryWindow(Gtk.Window):
 
     def _entry_keypress_callback(self, *args):
         keycode = args[1].get_keycode()[1]
+        keyval = args[1].get_keyval()[1]
         state = args[1].get_state()
         is_ctrl_pressed = (state & state.CONTROL_MASK).bit_length() > 0
         # Don't switch focus in case of up/down arrow
-        if keycode == keycodes.KEYCODE_ARROW_DOWN:
+        if keycode == keycodes.KEYCODE_ARROW_DOWN or keyval == keycodes.KEYVALUE_ARROW_DOWN:
             self._select_next_item()
-        elif keycode == keycodes.KEYCODE_ARROW_UP:
+        elif keycode == keycodes.KEYCODE_ARROW_UP or keyval == keycodes.KEYVALUE_ARROW_UP:
             self._select_previous_item()
         elif keycode == keycodes.KEYCODE_ESCAPE:
             sys.exit(0)
@@ -289,7 +290,9 @@ class EntryWindow(Gtk.Window):
 
     def _treeview_keypress(self, *args):
         keycode = args[1].get_keycode()[1]
-        if keycode not in (keycodes.KEYCODE_ARROW_UP, keycodes.KEYCODE_ARROW_DOWN):
+        keyval = args[1].get_keyval()[1]
+        if keycode not in (keycodes.KEYCODE_ARROW_UP, keycodes.KEYCODE_ARROW_DOWN) and \
+           keyval not in (keycodes.KEYVALUE_ARROW_UP, keycodes.KEYVALUE_ARROW_DOWN):
             self._search_textbox.grab_focus()
 
     def _get_selected_row(self):
