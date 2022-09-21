@@ -4,11 +4,11 @@ from fuzzywuzzy import fuzz
 
 
 def filter_printable(string):
-    if isinstance(string, unicode):
-        result = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
+    if isinstance(string, str):
+        result = unicodedata.normalize('NFKD', string)
     else:
-        result = string
-    return string
+        result = string.decode('utf8')
+    return result
 
 
 class ListFilter(object):
@@ -16,12 +16,15 @@ class ListFilter(object):
         self._search_key = ""
 
     def update_search_key(self, search_key):
-        self._search_key = self._normalize(search_key).decode('utf-8','ignore')
+        self._search_key = self._normalize(search_key)
 
     def _normalize(self, title):
         title = filter_printable(title)
-        for c in [" ", "\n", "\t"]:
-            title = title.replace(c, "")
+        try:
+            for c in [" ", "\n", "\t"]:
+                title = title.replace(c, "")
+        except:
+            breakpoint()
         title = title.lower()
         return title
 

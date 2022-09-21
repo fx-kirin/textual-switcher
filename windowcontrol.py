@@ -30,7 +30,7 @@ class WindowControl(object):
         io = GLib.IOChannel(stdout)
 
         def list_windows_callback(*_, **__):
-            output = io.read()
+            output = io.read().decode("utf8")
             windows = self.parse_wlist_output(output)
             icons = self._get_icons()
             for window in windows:

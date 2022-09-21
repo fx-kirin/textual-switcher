@@ -17,7 +17,7 @@ install: launch
 	@$(MAKE) install_firefox_extension >> installation.log 2>&1
 	@$(MAKE) install_chromium_extension >> installation.log 2>&1
 	@echo apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
-	@python2 apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
+	@python3 apply-binding.py ${KEY_BINDING} ${KEY_COMBINATION} >> installation.log 2>&1
 	@echo Installation complete.
 	@echo
 	@echo '*****************************************************************************************'

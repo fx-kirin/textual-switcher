@@ -33,7 +33,7 @@ def dconf_write(path, value):
 def dconf_read(path):
     cmd = ["dconf", "read", path]
     output = subprocess.check_output(cmd)
-    return output
+    return output.decode("utf8")
 
 
 def get_binding_list():
@@ -63,7 +63,7 @@ def add_binding_to_list_entry(new_binding_path, window_manager):
 
 
 def set_binding_entry(binding_values, entry_path, window_manager):
-    for name, value in binding_values.iteritems():
+    for name, value in binding_values.items():
         binding_path = "{}/{}".format(entry_path, name)
         dconf_write(binding_path, value)
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     args = parse_args()
     window_manager = detect_window_manager()
     if window_manager is None:
-        print "Unsupported desktop environment: {}".format(window_manager)
+        print("Unsupported desktop environment: {}".format(window_manager))
         sys.exit(1)
     key_combination = canonize_binding(args.key_combination, window_manager)
     set_paths(window_manager)
