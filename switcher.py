@@ -295,12 +295,16 @@ class EntryWindow(Gtk.Window):
             elif keycode == keycodes.KEYCODE_K:
                 self._select_previous_item()
             elif keycode == keycodes.KEYCODE_C:
-                self.set_visible(False)
+                sys.exit(1)
             elif keycode == keycodes.KEYCODE_L:
                 self._async_list_windows()
                 self._select_first_window()
             elif keycode == keycodes.KEYCODE_W:
                 self._search_textbox.set_text("")
+            elif keycode == keycodes.KEYCODE_R:
+                short_cut_path = Path("~/.textual_switcher/shortcuts.yml").expanduser()
+                if short_cut_path.exists():
+                    self._shortcuts = yaml.safe_load(short_cut_path.read_text())
             elif keycode == keycodes.KEYCODE_BACKSPACE:
                 self._send_signal_to_selected_process(signal.SIGTERM)
             elif keycode == keycodes.KEYCODE_BACKSLASH:
@@ -452,7 +456,8 @@ class EntryWindow(Gtk.Window):
 
     def _get_matched_window_id(self, regexp):
         for window in self._windows.values():
-            matches = re.search(regexp, window.title)
+            window_row_label = self._combine_title_and_wm_class(window.title, window.wm_class)
+            matches = re.search(regexp, window_row_label)
             if matches is not None:
                 return window.xid
         return None
