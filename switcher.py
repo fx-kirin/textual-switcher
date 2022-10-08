@@ -74,6 +74,8 @@ class EntryWindow(Gtk.Window):
         vbox.pack_start(self._search_textbox, expand=False, fill=True, padding=0)
         treeview_scroll_wrapper = self._create_treeview_scroll_wrapper()
         vbox.pack_start(treeview_scroll_wrapper, True, True, 0)
+        treeview_scroll_wrapper = self._create_treeview_scroll_wrapper()
+        vbox.pack_start(treeview_scroll_wrapper, True, True, 0)
         vbox.pack_start(self._help_label, False, True, 0)
 
     def _create_tree(self):

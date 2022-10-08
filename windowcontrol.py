@@ -68,9 +68,9 @@ class WindowControl(object):
                 continue
             line = line.lstrip()
             window.hostname, line = line.split(" ", 1)
+            window.title = line.lstrip()
             if window.title == "Desktop":
                 continue
-            window.title = line.lstrip()
             windows.append(window)
         return windows
 
