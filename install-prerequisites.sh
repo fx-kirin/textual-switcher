@@ -44,5 +44,5 @@ echo Installing required packages...
 ${PKG_MGR_CMD} ${COMMON_PACKAGES} ${PACKAGES}
 
 echo Installing required python libraries...
-sudo pip3 install setuptools
-sudo pip3 install -r requirements.txt
+sudo pip3 install --break-system-packages setuptools
+sudo pip3 install --break-system-packages -r requirements.txt
